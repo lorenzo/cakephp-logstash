@@ -21,7 +21,11 @@ class LogstashLogTest extends CakeTestCase {
 			->will($this->returnValue($file));
 
 		$engine->write('debug', 'This is a message');
-		$expected = json_encode(array('message' => 'This is a message', '_type' => 'debug'));
+		$expected = json_encode(array(
+			'@timestamp' => gmdate('c'),
+			'@type' => 'debug',
+			'@message' => 'This is a message'
+		));
 		fseek($file, 0);
 		$this->assertEquals($expected, fgets($file));
 	}
@@ -43,7 +47,11 @@ class LogstashLogTest extends CakeTestCase {
 			->will($this->returnValue($file));
 
 		$engine->write('debug', array('key' => 'value'));
-		$expected = json_encode(array('key' => 'value', '_type' => 'debug'));
+		$expected = json_encode(array(
+			'@timestamp' => gmdate('c'),
+			'@type' => 'debug',
+			'@fields' => array('key' => 'value')
+		));
 		fseek($file, 0);
 		$this->assertEquals($expected, fgets($file));
 	}
@@ -71,7 +79,11 @@ class LogstashLogTest extends CakeTestCase {
 
 		fclose($file);
 		$engine->write('debug', array('key' => 'value'));
-		$expected = json_encode(array('key' => 'value', '_type' => 'debug'));
+		$expected = json_encode(array(
+			'@timestamp' => gmdate('c'),
+			'@type' => 'debug',
+			'@fields' => array('key' => 'value')
+		));
 		fseek($file2, 0);
 		$this->assertEquals($expected, fgets($file2));
 	}

@@ -34,16 +34,21 @@ class LogstashLog extends BaseLog {
  * @return void
  */
 	public function write($type, $message) {
+		$log = array(
+			'@timestamp' => gmdate('c'),
+			'@type' => $type,
+		);
+
 		if (is_string($message)) {
-			$message = array('message' => $message);
+			$log['@message'] = $message;
+		} else {
+			$log['@fields'] = (array)$message;
 		}
 
-		$message['_type'] = $type;
-		$message = json_encode($message);
-
-		if ($this->_write($message) === false) {
+		$log = json_encode($log);
+		if ($this->_write($log) === false) {
 			$this->_close();
-			$this->_write($message);
+			$this->_write($log);
 		}
 	}
 
