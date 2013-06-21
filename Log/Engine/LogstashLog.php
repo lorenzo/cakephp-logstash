@@ -16,8 +16,7 @@ class LogstashLog extends BaseLog {
  */
 	protected $_config = array(
 		'host' => null,
-		'port' => null,
-		'timeout' => 5
+		'port' => null
 	);
 
 /**
@@ -35,10 +34,6 @@ class LogstashLog extends BaseLog {
  * @return void
  */
 	public function write($type, $message) {
-		if (!$this->_handle) {
-			$this->_open();
-		}
-
 		if (is_string($message)) {
 			$message = array('message' => $message);
 		}
@@ -53,22 +48,25 @@ class LogstashLog extends BaseLog {
 	}
 
 /**
+ * Configures this logger stream
+ *
+ * @param array $config
+ * @return array
+ */
+	public function config($config = array()) {
+		if (!isset($config['timeout'])) {
+			$config['timeout'] = 5;
+		}
+		return parent::config($config);
+	}
+
+/**
  * Opens a connection to logstash
  *
- * @return void
+ * @return resource
  */
-	protected function _open() {
-		$this->_handle = pfsockopen(
-			$this->_config['host'],
-			$this->_config['port'],
-			$errNo,
-			$errSt,
-			$this->_config['timeout']
-		);
-
-		if (!empty($errSt)) {
-			throw new CakeException($errSt);
-		}
+	protected function _open($host, $port, $timeout) {
+		$handle = pfsockopen($host, $port, $errNo, $errSt, $timeout);
 	}
 
 /**
@@ -79,9 +77,12 @@ class LogstashLog extends BaseLog {
  */
 	protected function _write($message) {
 		if (!$this->_handle) {
-			$this->_open();
+			$this->_handle = $this->_open($this->_config['host'], $this->_config['port'], $this->_config['timeout']);
+			if ($this->_handle === false) {
+				throw new SocketException('Could not connect to logstash');
+			}
 		}
-		return fwrite($message);
+		return @fwrite($this->_handle, $message);
 	}
 
 /**
@@ -90,7 +91,7 @@ class LogstashLog extends BaseLog {
  * @return void
  */
 	protected function _close() {
-		fclose($this->_handle);
+		@fclose($this->_handle);
 		$this->_handle = null;
 	}
 
@@ -101,7 +102,7 @@ class LogstashLog extends BaseLog {
  */
 	public function __destruct() {
 		if ($this->_handle) {
-			fflush($this->_handle);
+			@fflush($this->_handle);
 		}
 	}
 
