@@ -1,0 +1,20 @@
+{
+    "name": "lorenzo/cakephp-logstash",
+    "description": "CakePHP logstash log stream",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "log", "logstash"],
+    "homepage": "https://github.com/lorenzo/cakephp-logstash",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "José Lorenzo Rodríguez",
+            "role": "Author"
+        }
+    ],
+    "require": {
+        "composer/installers": "*"
+    },
+    "extra": {
+        "installer-name": "Logstash"
+    }
+}
