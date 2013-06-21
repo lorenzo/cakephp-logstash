@@ -59,6 +59,10 @@ class LogstashLog extends BaseLog {
  * @return array
  */
 	public function config($config = array()) {
+		if (empty($config)) {
+			return parent::config();
+		}
+
 		if (!isset($config['timeout'])) {
 			$config['timeout'] = 5;
 		}
