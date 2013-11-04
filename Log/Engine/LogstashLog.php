@@ -46,6 +46,12 @@ class LogstashLog extends BaseLog {
 		}
 
 		$log = json_encode($log);
+		
+		// Ensure utf-8 encoding
+		if (mb_detect_encoding($log) !== "UTF-8") {
+			$log = utf8_encode($log);
+		}
+
 		if ($this->_write($log) === false) {
 			$this->_close();
 			$this->_write($log);
