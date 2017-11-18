@@ -82,6 +82,7 @@ class LogstashLog extends BaseLog {
  */
 	protected function _open($host, $port, $timeout) {
 		$handle = pfsockopen($host, $port, $errNo, $errSt, $timeout);
+		return $handle;
 	}
 
 /**
